@@ -20,7 +20,7 @@ def market_task():
     if is_market_open():
         now = datetime.now(eastern)
         print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Market is open – running task.")
-        opm = OptionsPositionModel()
+        opm = OptionsPositionModel(send_message = True)
         opm.run()
     else:
         print("Skipped – outside market hours")
