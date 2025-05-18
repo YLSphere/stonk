@@ -10,7 +10,6 @@ def create_df_from_response(response):
     df['t'] = pd.to_datetime(df['t'], unit='ms')  # Convert timestamp
     df.set_index('t', inplace=True)
     df.reset_index(inplace = True)
-    print('Compiled DF Chunk!')
     df.rename(columns={
         't': 'Time', 
         'o': 'Open', 
@@ -47,11 +46,11 @@ def make_request_with_retry(url, params=None):
     print("Max retries reached. Request failed.")
     return None
 
-def get_historical_data(ticker, start_date, end_date):
+def get_historical_data(ticker, start_date, end_date, timespan = 'hour', multiplier = '1'):
 
     dfs = []
     # API endpoint
-    url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/hour/{start_date}/{end_date}"
+    url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{start_date}/{end_date}"
     params = {
         "adjusted": "true",
         "sort": "asc",
@@ -77,5 +76,5 @@ def get_historical_data(ticker, start_date, end_date):
                 dfs.append(df)
         else:
             print("Failed to fetch data:", response.status_code, response.text)
-
+    print(f'COMPILED DF FOR {ticker}')
     return pd.concat(dfs)
