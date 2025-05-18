@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 
 import src.constants as C
 import src.dataloader as dataloader
@@ -15,7 +16,7 @@ import joblib
 
 
 class OptionsPositionModel:
-    def __init__(self):
+    def __init__(self, send_message = True):
         # --- CONFIGURATION ---
         end_date = datetime.today()
         start_date = end_date - timedelta(days=365 * 4)
@@ -25,6 +26,7 @@ class OptionsPositionModel:
         self.end_str = end_date.strftime('%Y-%m-%d')
 
         self.whatsapp_msg = ""
+        self.send_message = send_message
     
     
 
@@ -186,7 +188,10 @@ class OptionsPositionModel:
                 self.backtest_model(df_labeled)
                 self.predict_next_day_advice(df_features)
 
-        pywhatkit.sendwhatmsg_instantly(C.WHATSAPP_CONTACT_NUMBER, 
-            self.whatsapp_msg,
-            tab_close = True
-        )
+        if self.send_message and len(re.findall("Buy Put|Buy Call", self.whatsapp_msg)) > 0:
+            pywhatkit.sendwhatmsg_instantly(C.WHATSAPP_CONTACT_NUMBER, 
+                self.whatsapp_msg,
+                tab_close = True
+            )
+        else:
+            print('No Outstanding Alerts')
